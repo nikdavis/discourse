@@ -92,6 +92,7 @@ class PostCreator
       ensure_in_allowed_users if guardian.is_staff?
       @post.advance_draft_sequence
       @post.save_reply_relationships
+      after_plugin_callbacks
     end
 
     if @post && @post.errors.empty?
@@ -168,9 +169,13 @@ class PostCreator
     end
   end
 
-  def plugin_callbacks
+  def before_plugin_callbacks
     DiscourseEvent.trigger :before_create_post, @post
     DiscourseEvent.trigger :validate_post, @post
+  end
+
+  def after_plugin_callbacks
+    DiscourseEvent.trigger :after_create_post, @post
   end
 
   def track_latest_on_category
